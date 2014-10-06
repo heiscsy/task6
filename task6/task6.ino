@@ -10,24 +10,24 @@
 //int BUTTON=;
 //int SLOT=;
 
-
-public char time200 = 0;
+char time200 = 0;
 //public char time4 = 0;
-public int sonicValue=0;
-public int irValue=0;
-public int encoderSpeed = 0;
+int sonicValue=0;
+int irValue=0;
+int encoderSpeed = 0;
 
-public boolean buttonValue= false;
-public boolean slotValue= false;
+boolean buttonValue= false;
+boolean slotValue= false;
+int SerialState=0;
 
-public int SerialState=0;
+char Serialdelay = 0;
 
 
 void timerInterrupt(){
   //read switch at a granulartiy of 0.02s
   //take serial communication every 0.1s
   static int timer_count = 0;
-
+  Serialdelay++;
   timer_count++;
   if(timer_count ==200) {
     //0.1 secound reached
@@ -42,8 +42,8 @@ void setup(){
  Timer1.attachInterrupt(timerInterrupt);
  Serial.begin(9600);
  
- pinMode(BUTTON, INPUT);
- pinMode(SLOT, INPUT);
+ //pinMode(BUTTON, INPUT);
+ //pinMode(SLOT, INPUT);
 
  //set other output 
 }
@@ -59,7 +59,7 @@ void sendData(){
   Serial.print("\n"); 
   //send encoder Value
   Serial.write("W");
-  Serial.write(encoderValue);
+  Serial.write(encoderSpeed);
   Serial.print("\n");
   //send button state
   Serial.write("B");
