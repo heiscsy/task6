@@ -15,6 +15,8 @@ char time200 = 0;
 int sonicValue=0;
 int irValue=0;
 int encoderSpeed = 0;
+int ButtonBuf= 0;
+int buttonPush =0;
 
 boolean buttonValue= false;
 boolean slotValue= false;
@@ -29,6 +31,13 @@ void timerInterrupt(){
   static int timer_count = 0;
   Serialdelay++;
   timer_count++;
+  if(timer_count % 4 ==0){
+    ButtonBuf = ButtonBuf*2 + isPushedButton();
+    if (ButtonBuf==15){
+        buttonPush = 1;
+      }
+    }
+
   if(timer_count ==200) {
     //0.1 secound reached
     time200 = 1;
@@ -79,7 +88,10 @@ void readSensor(){
   //receive encoder data
   encoderValue = getDCSpeed_rpm();
   //read button state
-  buttonValue = isPushedButton();
+  buttonValue = buttonPush;
+  buttonPudh = 0;
+    
+    
   //read slotswitch state
   slotValue = isTriggeredSlot();
 }
