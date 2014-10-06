@@ -5,7 +5,7 @@
 //all right reserved 
 #include <TimerOne.h>
 #include <stdlib.h>
-
+#include "Task6drivers.h"
 
 //int BUTTON=;
 //int SLOT=;
@@ -22,8 +22,12 @@ boolean buttonValue= false;
 boolean slotValue= false;
 int SerialState=0;
 
+//Seriadelay signal, 1 for 0.005s
 char Serialdelay = 0;
 
+// this is variables used in Serial communication
+char CharReceived = 0;
+int ValReceived=0;
 
 void timerInterrupt(){
   //read switch at a granulartiy of 0.02s
@@ -86,10 +90,10 @@ void readSensor(){
   //receive ultrasonic distance 
   sonicValue = getSonicDistance_mm();
   //receive encoder data
-  encoderValue = getDCSpeed_rpm();
+  encoderSpeed = getDCSpeed_rpm();
   //read button state
   buttonValue = buttonPush;
-  buttonPudh = 0;
+  buttonPush = 0;
     
     
   //read slotswitch state
@@ -99,16 +103,16 @@ void readSensor(){
 
 void loop(){
   //read the serial input and report data to the server.
-  if(time200 = 1){
+  if(time200 == 1){
     readSensor();
     sendData();    
-    timer200 = 0;
+    time200 = 0;
     }
   //Check serial port
   int len = Serial.available();                                                              
   if ((Serial.available() >0 )&&(SerialState == 0)) {                             //when the serial input is ready                                 
     CharReceived=Serial.read();                                                   //read the character
-    if ((CharReceived == 'a' )||(CharReceived == 'w') ||(CharRecieved == 's')) {  //if it is in the char list, transist the serial state into 1, reset the delay signal
+    if ((CharReceived == 'a' )||(CharReceived == 'w') ||(CharReceived == 's')) {  //if it is in the char list, transist the serial state into 1, reset the delay signal
       SerialState = 1;
       Serialdelay=0;
     }
@@ -123,18 +127,14 @@ void loop(){
       Serial.print(ValReceived);                                   
         switch(CharReceived){
           case 'a': setServoAngle(ValReceived);break;                                //apply the command on motor        
-          case 'w': setDCspeed(ValReceived);break;
-          //case 'd': analogWrite(LedBluePin, 255-ValReceived);break;
+          case 'w': setDCSpeed(ValReceived);break;
           case 's': setStepperAngle(ValReceived);break;
-          //case 'D': analogWrite(LedBluePin, 255-ValReceived);break;
           }
-        SerialState = 0;                                                              //transist back to receiving letters
-        break;      
+        SerialState = 0;                                                              //transist back to receiving letters   
       }   
       else                                                                               //anything else are garbage, return letter polling
       { 
-      SerialState=0;
-      break;      
+      SerialState=0;   
       } 
     }
   
