@@ -5,10 +5,12 @@
 //all right reserved 
 #include <TimerOne.h>
 #include <stdlib.h>
-#include "Task6drivers.h"
+#include "Task6Drivers.h"
 
 //int BUTTON=;
 //int SLOT=;
+
+
 
 char time200 = 0;
 //public char time4 = 0;
@@ -17,6 +19,9 @@ int irValue=0;
 int encoderSpeed = 0;
 int ButtonBuf= 0;
 int buttonPush =0;
+
+
+char dcWorkingState= 0;
 
 boolean buttonValue= false;
 boolean slotValue= false;
@@ -112,7 +117,7 @@ void loop(){
   int len = Serial.available();                                                              
   if ((Serial.available() >0 )&&(SerialState == 0)) {                             //when the serial input is ready                                 
     CharReceived=Serial.read();                                                   //read the character
-    if ((CharReceived == 'a' )||(CharReceived == 'w') ||(CharReceived == 's')) {  //if it is in the char list, transist the serial state into 1, reset the delay signal
+    if ((CharReceived == 'a' )||(CharReceived == 'w') ||(CharReceived == 's')||('p')) {  //if it is in the char list, transist the serial state into 1, reset the delay signal
       SerialState = 1;
       Serialdelay=0;
     }
@@ -127,7 +132,8 @@ void loop(){
       Serial.print(ValReceived);                                   
         switch(CharReceived){
           case 'a': setServoAngle(ValReceived);break;                                //apply the command on motor        
-          case 'w': setDCSpeed(ValReceived);break;
+          case 'w': setDCSpeed(ValReceived);dcWorkingState=0;break;
+          case 'p': dcWorkingState=1;break;
           case 's': setStepperAngle(ValReceived);break;
           }
         SerialState = 0;                                                              //transist back to receiving letters   
@@ -137,7 +143,15 @@ void loop(){
       SerialState=0;   
       } 
     }
-  
+    
+  //check dc working state
+  //0 for set speed, 1 for set angle
+  if(dcWorkingState == 0) {
+    actuateDC();
+    }
+    else{
+    turnDC();
+    }  
 
 }
   
